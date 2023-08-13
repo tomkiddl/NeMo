@@ -16,7 +16,7 @@
 import torch
 from torch import nn as nn
 from torch.nn import LayerNorm
-
+import logging
 from nemo.collections.asr.parts.submodules.batchnorm import FusedBatchNorm1d
 from nemo.collections.asr.parts.submodules.causal_convs import CausalConv1D
 from nemo.collections.asr.parts.submodules.multi_head_attention import (
@@ -346,7 +346,12 @@ class ConformerConvolution(nn.Module):
             x = self.pointwise_activation(x)
 
         if pad_mask is not None:
-            x = x.float().masked_fill(pad_mask.unsqueeze(1), 0.0)
+            # logging.warning("conformer module")
+            # logging.warning(f"scores dtype: { x.dtype}")  # print the dtype of scores
+            # logging.warning(f"mask dtyp should be boole:{ pad_mask.dtype}")  # print the dtype of mask
+            # logging.warning(f"fill value dtype: {torch.tensor(0.0).dtype}") 
+            
+            x = x.float().masked_fill(pad_mask.unsqueeze(1), torch.tensor(0.0, dtype=x.dtype))
 
         x = self.depthwise_conv(x, cache=cache)
         if cache is not None:

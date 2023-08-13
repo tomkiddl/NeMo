@@ -284,11 +284,11 @@ class UnivNetModel(Vocoder, Exportable):
                     ]
 
             self.logger.experiment.log({"audio": clips, "specs": specs})
-
+    
     def _bias_denoise(self, audio, mel):
         def stft(x):
             comp = torch.stft(x.squeeze(1), n_fft=1024, hop_length=256, win_length=1024, return_complex=True)
-            comp = torch.view_as_real(comp)
+            comp = model_utils.view_as_real(comp)
             real, imag = comp[..., 0], comp[..., 1]
             mags = torch.sqrt(real ** 2 + imag ** 2)
             phase = torch.atan2(imag, real)

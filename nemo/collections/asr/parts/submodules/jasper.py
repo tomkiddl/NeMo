@@ -478,6 +478,7 @@ class SqueezeExcite(nn.Module):
             mask = self.make_pad_mask(lengths, max_audio_length=max_len, device=x.device)
             mask = ~mask  # 0 represents value, 1 represents pad
             x = x.float()  # For stable AMP, SE must be computed at fp32.
+            logging.warning("masked fil jasper")
             x.masked_fill_(mask, 0.0)  # mask padded values explicitly to 0
             y = self._se_pool_step(x, mask)  # [B, C, 1]
             y = y.transpose(1, -1)  # [B, 1, C]

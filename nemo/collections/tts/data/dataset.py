@@ -57,7 +57,7 @@ from nemo.collections.tts.torch.tts_data_types import (
     WithLens,
 )
 from nemo.core.classes import Dataset
-from nemo.utils import logging
+from nemo.utils import logging, model_utils
 
 try:
     from nemo_text_processing.text_normalization.normalize import Normalizer
@@ -495,7 +495,7 @@ class TTSDataset(Dataset):
         with torch.cuda.amp.autocast(enabled=False):
             spec = self.stft(audio)
             if spec.dtype in [torch.cfloat, torch.cdouble]:
-                spec = torch.view_as_real(spec)
+                spec = model_utils.view_as_real(spec)
             spec = torch.sqrt(spec.pow(2).sum(-1) + EPSILON)
         return spec
 

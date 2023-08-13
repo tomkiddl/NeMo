@@ -16,7 +16,7 @@
 import itertools
 import math
 from typing import Dict, Iterator, List, Tuple, Union
-
+import logging
 import torch
 
 try:
@@ -133,6 +133,23 @@ def scaled_init_method_normal(sigma, num_layers):
 
     return init_
 
+
+def masked_fill_logging(tensor, mask, value):
+    """
+    Function to perform masked_fill operation with logging for type mismatch.
+
+    Args:
+    tensor (torch.Tensor): The input tensor.
+    mask (torch.Tensor): The mask tensor.
+    value (float): The value to fill.
+
+    Returns:
+    torch.Tensor: The result of the masked_fill operation.
+    """
+    if tensor.dtype != mask.dtype:
+        logging.warning(f"Type mismatch in masked_fill! Tensor dtype: {tensor.dtype}, mask dtype: {mask.dtype}")
+
+    return tensor.masked_fill(mask, value)
 
 def attention_mask_func(attention_scores, attention_mask):
     attention_scores.masked_fill_(attention_mask, -10000.0)

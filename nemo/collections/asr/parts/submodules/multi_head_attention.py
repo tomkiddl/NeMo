@@ -39,6 +39,7 @@ from typing import List, Tuple
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+import logging
 
 from nemo.utils import avoid_float16_autocast_context
 
@@ -106,6 +107,10 @@ class MultiHeadAttention(nn.Module):
         """
         n_batch = value.size(0)
         if mask is not None:
+            # logging.warning("multiheadattention")
+            # logging.warning(f"scores dtype: { scores.dtype}")  # print the dtype of scores
+            # logging.warning(f"mask dtype:{ mask.dtype}")  # print the dtype of mask
+            # logging.warning(f"fill value dtype: {torch.tensor(-10000.0).dtype}") 
             mask = mask.unsqueeze(1)  # (batch, 1, time1, time2)
             scores = scores.masked_fill(mask, -10000.0)
             attn = torch.softmax(scores, dim=-1).masked_fill(mask, 0.0)  # (batch, head, time1, time2)

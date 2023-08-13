@@ -334,6 +334,7 @@ class MaskEstimatorRNN(NeuralModule):
         length_mask: torch.Tensor = make_seq_mask_like(
             lengths=input_length, like=output, time_dim=-1, valid_ones=False
         )
+        logging.warning(f"masked_fill output in class {self.__class__.__name__}")
         output = output.masked_fill(length_mask, 0.0)
 
         return output, input_length
@@ -476,6 +477,7 @@ class MaskBasedBeamformer(NeuralModule):
         )
         # Use each mask to generate an output at ref_channel
         output = []
+        logging.warning(f"masked_fill forwad class {self.__class__.__name__}")
         for m in range(mask.size(1)):
             # Prepare mask for the desired and the undesired signal
             mask_desired = mask[:, m, ...].masked_fill(length_mask, 0.0)
@@ -585,6 +587,7 @@ class WPEFilter(NeuralModule):
             length_mask: torch.Tensor = make_seq_mask_like(
                 lengths=input_length, like=desired_signal, time_dim=-1, valid_ones=False
             )
+            logging.warning(f"masked_fill  inputlength in class {self.__class__.__name__}")
             desired_signal = desired_signal.masked_fill(length_mask, 0.0)
 
         return desired_signal, input_length
@@ -698,6 +701,7 @@ class WPEFilter(NeuralModule):
             length_mask: torch.Tensor = make_seq_mask_like(
                 lengths=input_length, like=weight, time_dim=-1, valid_ones=False
             )
+            logging.warning(f"masked_fill estimate cor{self.__class__.__name__}")
             weight = weight.masked_fill(length_mask, 0.0)
 
         # Calculate (1)

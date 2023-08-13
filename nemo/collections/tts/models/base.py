@@ -171,7 +171,7 @@ class GlowVocoder(Vocoder):
                     window=window,
                     return_complex=True,
                 )
-                spec = torch.view_as_real(spec)
+                spec = model_utils.view_as_real(spec)
                 return torch.sqrt(spec.pow(2).sum(-1)), torch.atan2(spec[..., -1], spec[..., 0])
 
             self.stft = lambda x: yet_another_patch(

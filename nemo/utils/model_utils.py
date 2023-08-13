@@ -20,6 +20,7 @@ from enum import Enum
 from functools import lru_cache
 from pathlib import Path
 from typing import List, Optional, Tuple, Union
+import torch
 
 import wrapt
 
@@ -40,6 +41,12 @@ except ModuleNotFoundError:
 
 
 _VAL_TEST_FASTPATH_KEY = 'ds_item'
+
+
+def view_as_real(tensor):
+    real = torch.real(tensor)
+    imag = torch.imag(tensor)
+    return torch.stack((real, imag), dim=-1)
 
 
 class ArtifactPathType(Enum):

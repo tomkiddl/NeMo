@@ -17,7 +17,7 @@ import random
 import numpy as np
 import torch
 import torch.nn as nn
-
+import logging
 from nemo.core.classes import Typing, typecheck
 from nemo.core.neural_types import LengthsType, NeuralType, SpectrogramType
 
@@ -109,6 +109,7 @@ class SpecAugment(nn.Module, Typing):
                 fill_mask[idx, :, start : start + width] = True
         # Bring the mask to device and fill spec
         fill_mask = torch.from_numpy(fill_mask).to(input_spec.device)
+        logging.warning(f"masked_fill in class {self.__class__.__name__}")
         masked_spec = input_spec.masked_fill(mask=fill_mask, value=self.mask_value)
         return masked_spec
 

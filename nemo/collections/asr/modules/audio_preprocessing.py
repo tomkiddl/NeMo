@@ -777,6 +777,7 @@ class AudioToSpectrogram(NeuralModule):
             length_mask: torch.Tensor = make_seq_mask_like(
                 lengths=output_length, like=output, time_dim=-1, valid_ones=False
             )
+            logging.warning("masked fil audio processing2")
             output = output.masked_fill(length_mask, 0.0)
         else:
             # Assume all frames are valid for all examples in the batch
@@ -878,6 +879,7 @@ class SpectrogramToAudio(NeuralModule):
             length_mask: torch.Tensor = make_seq_mask_like(
                 lengths=output_length, like=output, time_dim=-1, valid_ones=False
             )
+            logging.warning("masked fil audio processing")
             output = output.masked_fill(length_mask, 0.0)
         else:
             # Assume all frames are valid for all examples in the batch

@@ -271,7 +271,7 @@ class EncDecRNNTModel(ASRModel, ASRModuleMixin, ExportableEncDecModel):
             self.decoder.freeze()
             self.joint.freeze()
             logging_level = logging.get_verbosity()
-            logging.set_verbosity(logging.WARNING)
+            logging.set_verbosity(logging.INFO)
             # Work in tmp directory - will store manifest file there
             with tempfile.TemporaryDirectory() as tmpdir:
                 with open(os.path.join(tmpdir, 'manifest.json'), 'w', encoding='utf-8') as fp:
@@ -650,15 +650,16 @@ class EncDecRNNTModel(ASRModel, ASRModuleMixin, ExportableEncDecModel):
             )
 
         if not has_processed_signal:
-            print(input_signal.shape)
-            print(input_signal_length.length.shape)
+            logging.info("--- not processed --- ")
+            logging.info(input_signal.shape)
+            logging.info(input_signal_length.shape)
             processed_signal, processed_signal_length = self.preprocessor(
                 input_signal=input_signal, length=input_signal_length,
             )
        
-        print("--- processed --- ")
-        print(input_signal.shape)
-        print(input_signal_length.length.shape)
+        logging.info("--- processed signal --- ")
+        logging.info(processed_signal.shape)
+        logging.info(processed_signal_length.shape)
 
         # Spec augment is not applied during evaluation/testing
         if self.spec_augmentation is not None and self.training:
@@ -681,7 +682,7 @@ class EncDecRNNTModel(ASRModel, ASRModuleMixin, ExportableEncDecModel):
         else:
             encoded, encoded_len = self.forward(input_signal=signal, input_signal_length=signal_len)
         del signal
-
+        
         # During training, loss must be computed, so decoder forward is necessary
         decoder, target_length, states = self.decoder(targets=transcript, target_length=transcript_len)
 

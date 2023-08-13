@@ -56,7 +56,7 @@ from nemo.core.classes.common import typecheck
 from nemo.core.classes.module import NeuralModule
 from nemo.core.neural_types.elements import AudioSignal, MelSpectrogramType, VoidType
 from nemo.core.neural_types.neural_type import NeuralType
-
+from nemo.utils import logging, model_utils
 
 class KernelPredictor(torch.nn.Module):
     ''' Kernel predictor for the location-variable convolutions'''
@@ -574,7 +574,7 @@ class DiscriminatorR(NeuralModule):
         n_fft, hop_length, win_length = self.resolution
         x = F.pad(x, (int((n_fft - hop_length) / 2), int((n_fft - hop_length) / 2)), mode='reflect')
         x = x.squeeze(1)
-        x = torch.view_as_real(
+        x = model_utils.view_as_real(
             torch.stft(x, n_fft=n_fft, hop_length=hop_length, win_length=win_length, center=False, return_complex=True)
         )  # [B, F, TT, 2] (Note: torch.stft() returns complex tensor [B, F, TT]; converted via view_as_real)
         mag = torch.norm(x, p=2, dim=-1)  # [B, F, TT]

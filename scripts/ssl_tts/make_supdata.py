@@ -31,7 +31,7 @@ from nemo.collections.asr.parts.preprocessing.segment import AudioSegment
 from nemo.collections.tts.models import ssl_tts
 from nemo.collections.tts.parts.utils.tts_dataset_utils import get_base_dir
 from nemo.core.classes import Dataset
-from nemo.utils import logging
+from nemo.utils import logging, model_utils
 
 
 class AudioDataset(Dataset):
@@ -171,7 +171,7 @@ def get_mel_spectrogram(fb, wav, stft_params):
     )
 
     if spec.dtype in [torch.cfloat, torch.cdouble]:
-        spec = torch.view_as_real(spec)
+        spec = model_utils.view_as_real(spec)
     spec = torch.sqrt(spec.pow(2).sum(-1) + EPSILON)
 
     mel = torch.matmul(fb.to(spec.dtype), spec)

@@ -41,9 +41,10 @@ import numpy as np
 import torch
 import torch.nn as nn
 
+
 from nemo.collections.asr.parts.preprocessing.perturb import AudioAugmentor
 from nemo.collections.asr.parts.preprocessing.segment import AudioSegment
-from nemo.utils import logging
+from nemo.utils import logging, model_utils
 
 try:
     import torchaudio
@@ -111,6 +112,7 @@ def clean_spectrogram_batch(spectrogram: torch.Tensor, spectrogram_len: torch.Te
     batch_size, _, max_len = spectrogram.shape
     mask = torch.arange(max_len, device=device)[None, :] >= spectrogram_len[:, None]
     mask = mask.unsqueeze(1).expand_as(spectrogram)
+    logging.warning("masked fill features spectogram")
     return spectrogram.masked_fill(mask, fill_value)
 
 
@@ -406,8 +408,8 @@ class FilterbankFeatures(nn.Module):
             ).squeeze(1)
 
         # dither (only in training mode for eval determinism)
-        if self.training and self.dither > 0:
-            x += self.dither * torch.randn_like(x)
+        # if self.training and self.dither > 0:
+        #     x += self.dither * torch.randn_like(x)
 
         # do preemphasis
         if self.preemph is not None:
@@ -420,7 +422,7 @@ class FilterbankFeatures(nn.Module):
         # torch stft returns complex tensor (of shape [B,N,T]); so convert to magnitude
         # guard is needed for sqrt if grads are passed through
         guard = 0 if not self.use_grads else CONSTANT
-        x = torch.view_as_real(x)
+        x = model_utils.view_as_real(x)
         x = torch.sqrt(x.pow(2).sum(-1) + guard)
 
         if self.training and self.nb_augmentation_prob > 0.0:
@@ -459,6 +461,7 @@ class FilterbankFeatures(nn.Module):
         max_len = x.size(-1)
         mask = torch.arange(max_len).to(x.device)
         mask = mask.repeat(x.size(0), 1) >= seq_len.unsqueeze(1)
+        logging.warning("tom masked fil afeatures x.maskedfill")
         x = x.masked_fill(mask.unsqueeze(1).type(torch.bool).to(device=x.device), self.pad_value)
         del mask
         pad_to = self.pad_to
@@ -614,6 +617,7 @@ class FilterbankFeaturesTA(nn.Module):
 
     def _apply_normalization(self, features: torch.Tensor, lengths: torch.Tensor, eps: float = 1e-5) -> torch.Tensor:
         # For consistency, this function always does a masked fill even if not normalizing.
+        logging.warning("masked fil  feautres apply normalising")
         mask: torch.Tensor = make_seq_mask_like(lengths=lengths, like=features, time_dim=-1, valid_ones=False)
         features = features.masked_fill(mask, 0.0)
         # Maybe don't normalize
@@ -627,6 +631,7 @@ class FilterbankFeaturesTA(nn.Module):
             if self._normalize_strategy == "all_features":
                 reduce_dim = [1, 2]
             # [B, D, T] -> [B, D, 1] or [B, 1, 1]
+            logging.warning("masked fil feartures applu nomaldsk fd")
             means = features.sum(dim=reduce_dim, keepdim=True).div(lengths.view(-1, 1, 1))
             stds = (
                 features.sub(means)
@@ -641,6 +646,7 @@ class FilterbankFeaturesTA(nn.Module):
         else:
             # Deprecating constant std/mean
             raise ValueError(f"Unsupported norm type: '{self._normalize_strategy}")
+        logging.warning("masked fil features ")
         features = features.masked_fill(mask, 0.0)
         return features
 

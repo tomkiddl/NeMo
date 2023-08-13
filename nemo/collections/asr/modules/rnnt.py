@@ -1715,6 +1715,7 @@ class SampledRNNTJoint(RNNTJoint):
         # Sampled RNNT is only used for training.
         if not torch.is_grad_enabled() or torch.is_inference_mode_enabled():
             # Simply call full tensor joint
+            logging.warning("running SampledRNNTJoint decoder fowrad")
             return super().forward(
                 encoder_outputs=encoder_outputs,
                 decoder_outputs=decoder_outputs,
